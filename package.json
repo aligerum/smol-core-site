@@ -1,0 +1,24 @@
+{
+  "name": "smol-core-site",
+  "version": "0.1.0",
+  "description": "Site Core for smol",
+  "main": "main.js",
+  "keywords": [
+    "core",
+    "site",
+    "smol",
+    "static"
+  ],
+  "author": "Allister Aligerum",
+  "license": "MIT",
+  "repository": "github:aligerum/smol-core-site",
+  "homepage": "https://smol.aligerum.io",
+  "bugs": "allister@aligerum.io",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^3.0.0",
+    "smol": "github:aligerum/smol",
+    "stylus": "^0.54.7",
+    "webpack": "^4.43.0"
+  }
+}
