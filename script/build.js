@@ -366,7 +366,7 @@ let buildScript = async options => {
       },
     },
   }
-  if (options.templateBody) config.module.rules.find(rule => rule.use == 'vue-loader').use = ['vue-loader', {loader: `${__dirname}/../script/loader.js`, options: {templateBody: options.templateBody}}]
+  if (options.templateBody) config.module.rules.find(rule => rule.use == 'vue-loader').use = ['vue-loader', {loader: `${__dirname}/../script/static-slot-loader.js`, options: {templateBody: options.templateBody}}]
   if (options.component) config.resolve.modules.push(options.component.modulePath)
   // if (smolConfig.mode == 'development') config.resolve.alias.vue = 'vue/dist/vue.js'
 
