@@ -4,7 +4,7 @@ const smol = require('smol')
 const coreConfig = smol.config(smol.coreName)
 
 // serve from output/<coreName>/public
-app.use(express.static(`${process.cwd()}/output/${smol.coreName}/public`))
+app.use(express.static(`${process.cwd()}/output/${smol.coreName}/public`, {extensions: ['html', 'htm']}))
 
 // remove powered by express header
 app.disable('x-powered-by')
