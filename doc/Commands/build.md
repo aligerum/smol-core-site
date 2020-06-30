@@ -48,9 +48,9 @@ const smol = require('smol')
 const smolConfig = smol.config()
 
 module.exports = {
-  options: {
-    {file: 'public/index.pug', templateData: {appName: smolConfig.appName}},
-  }
+  files: [
+    {src: 'public/index.pug', data: {appName: smolConfig.appName}},
+  ],
 }
 ```
 
@@ -65,3 +65,22 @@ body
   #app
   script(src="/script/app.js")
 ```
+
+In addition to specifying individual files, you can define directories, and all files within that directory and all subdirectories will have access to that data. Data cascades down, for example:
+
+```js
+let data = {
+  appName: 'Some App',
+}
+
+module.exports = {
+  files: [
+    {src: 'public', data}
+    {src: 'public/contact.pug', data: {color: 'blue'}},
+  ],
+}
+```
+
+In this example, `public/index.pug` would have access to `appName`, because everything in the `public` directory has access to that data, but `public/contact.pug` would have access to `appName` _and_ `color`, as that data was passed to it.
+
+The order of these definitions does not matter, but the specificity does. More specific rules (longer paths) will add to less specific rules. Data is overwritten at the top level, meaning the contents of arrays and objects of the same name are not merged, they're replaced.
