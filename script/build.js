@@ -363,7 +363,7 @@ let buildScript = async options => {
         corePath: `${process.cwd()}/core/${smol.coreName}`,
         coreConfig: `${process.cwd()}/config/${smol.coreName}.json`,
         cwd: process.cwd(),
-        include: `${process.cwd()}/core/${smol.coreName}/include`
+        include: `${process.cwd()}/core/${smol.coreName}/include`,
         smolConfig: `${process.cwd()}/config/smol.json`,
       },
     },
