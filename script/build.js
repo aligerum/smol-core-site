@@ -359,11 +359,12 @@ let buildScript = async options => {
         `${process.cwd()}/node_modules/smol-core-site/node_modules`,
       ],
       alias: {
-        cwd: process.cwd(),
+        config: `${process.cwd()}/config`,
         corePath: `${process.cwd()}/core/${smol.coreName}`,
         coreConfig: `${process.cwd()}/config/${smol.coreName}.json`,
-        smolConfig: `${process.cwd()}/config/smol.json`,
+        cwd: process.cwd(),
         include: `${process.cwd()}/core/${smol.coreName}/include`
+        smolConfig: `${process.cwd()}/config/smol.json`,
       },
     },
   }

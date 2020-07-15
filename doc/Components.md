@@ -76,6 +76,7 @@ You can use `require` and `import` directives in the script to import project-le
 | Alias | Path |
 | --- | --- |
 | `cwd` | `<projectPath>` |
+| `config` | `<projectPath>/config` |
 | `corePath` | `<projectPath>/core/<coreName>` |
 | `coreConfig` | `<projectPath>/config/<coreName>.json` |
 | `smolConfig` | `<projectPath>/config/smol.json` |
