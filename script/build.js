@@ -349,6 +349,7 @@ let buildScript = async options => {
     ],
     resolveLoader: {
       modules: [
+        `${process.cwd()}/node_modules`,
         `${process.cwd()}/node_modules/smol-core-site/node_modules`,
       ],
     },
