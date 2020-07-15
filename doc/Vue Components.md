@@ -36,9 +36,7 @@ export default {
   data() {
     return {
       userName: null,
-      people: [
-        {name: }
-      ],
+      people: []
     }
   }
   async mounted() {
@@ -110,7 +108,7 @@ export default {
     return {
     }
   },
-  mounted() {
+  async mounted() {
   },
   methods: {
   },
