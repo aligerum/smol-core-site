@@ -130,3 +130,29 @@ Created core/mySite/component/my-vue-component/SomeSubComponent.vue
 # Static Components
 
 You cannot use static components within Vue components.
+
+# Public Data
+
+Public Data works just as with regular static components. It is typically convenient to copy window.smolPublicData.<componentName> in when defining the Vue component's `data`. This is done by default when using `make`, for example, a component called some-component:
+
+```js
+export default {
+  components: {
+  },
+  data() {
+    return {
+      publicData: window.smolPublicData && window.smolPublicData.someComponent ? window.smolPublicData.someComponent : {},
+    }
+  },
+  async mounted() {
+  },
+  methods: {
+  },
+  props: {
+  },
+  watch: {
+  },
+}
+```
+
+You can then pass this data down to subcomponents using `v-bind`, or just access `window.smolPublicData.someComponent` during their `data` function as well.

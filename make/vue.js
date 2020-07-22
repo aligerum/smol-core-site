@@ -1,10 +1,10 @@
 const smol = require('smol')
 
 module.exports = {
-  description: 'Static Component',
+  description: 'Vue Subcomponent',
   files: [
     {
-      from: 'vueComponent.vue',
+      from: 'vueSubcomponent.vue',
       to: path => {
         let filename = path.split('/').slice(-1)[0]
         path = path.split('/').slice(0, -1).join('/')

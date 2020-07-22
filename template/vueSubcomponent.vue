@@ -12,7 +12,6 @@ export default {
   },
   data() {
     return {
-      publicData: window.smolPublicData && window.smolPublicData.camelCaseComponentName ? window.smolPublicData.camelCaseComponentName : {},
     }
   },
   async mounted() {

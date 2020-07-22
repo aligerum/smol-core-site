@@ -17,7 +17,8 @@ module.exports = {
       to: filename => `component/${filename}/${smol.string.studlyCase(filename)}.vue`,
       parse: template => {
         return smol.string.replace(template.content, {
-          componentName: template.filename
+          componentName: template.filename,
+          camelCaseComponentName: smol.string.camelCase(template.filename),
         })
       },
     },
