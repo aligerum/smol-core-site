@@ -22,7 +22,7 @@ module.exports = {
       },
     },
     {
-      from: 'componentDoc.md',
+      from: 'vueComponentDoc.md',
       to: (filename, core) => `../../doc/${require(process.cwd() + '/core/' + core + '/core.json').displayName}/Components/${filename}.md`,
       parse: template => {
         return smol.string.replace(template.content, {
