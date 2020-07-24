@@ -73,7 +73,7 @@ block body
 
 Because it is not readily apparent what data is available within each component/slot, it is vital that you provide proper documentation and examples for static vue components.
 
-Normal slots work as usual. Only slots with the `static` attribute will be replaced in this way at build time.
+Normal slots work as usual. Only slots with the `static` attribute will be replaced in this way at build time. You can also add the `append` or `prepend` directive within the template as usual, ex: `template(slot="top" append)`. Any content defined within the Vue Component's static slot serves as the default.
 
 # Normal Vue Components
 
