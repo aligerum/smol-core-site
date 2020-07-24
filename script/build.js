@@ -250,14 +250,21 @@ let buildPug = async (command, from, to, outputDir, templateData) => {
       if (typeof component.def.publicData == 'string') component.def.publicData = []
       if (Array.isArray(component.def.publicData)) for (let key of component.def.publicData) publicData[key] = templateData[key]
       else publicData = await component.def.publicData(templateData)
-      if (Object.keys(publicData).length) pagePublicData.push(`${smol.string.camelCase(name)}: ${JSON.stringify(publicData)}`)
+      if (Object.keys(publicData).length) {
+        let serializedPublicData = JSON.stringify(publicData, (name, value) => {
+          if (typeof value == 'function') return `SMOLFUNCTIONSTART${value.toString()}SMOLFUNCTIONEND`
+          return value
+        })
+        serializedPublicData = serializedPublicData.replace(/"SMOLFUNCTIONSTART[\s\S]+?SMOLFUNCTIONEND"/g, value => value.slice(18, -16))
+        pagePublicData.push(`${smol.string.camelCase(name)}:${serializedPublicData}`)
+      }
     }
 
   }
 
   // add public data to page
   if (pagePublicData.length) {
-    let publicDataScript = `smolPublicData = {${pagePublicData.join(',')}}`
+    let publicDataScript = `smolPublicData={${pagePublicData.join(',')}}`
     output = output.replace(/<\/body>/, `<script>${publicDataScript}</script></body>`)
   }
 
