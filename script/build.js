@@ -218,19 +218,6 @@ let buildPug = async (command, from, to, outputDir, templateData) => {
       else pageCommonTags.push({tag: 'script', attributes: {src: '//cdn.jsdelivr.net/npm/vue'}})
       let instanceIndex = 0
       for (let match of output.match(new RegExp(`<${name}.*?(?=<\\/${name}>)`, 'g'))) {
-        // let instance = componentInstances[instanceIndex]
-        // instanceIndex++
-        // let templateBody = match.slice(match.indexOf('>') + 1)
-        // let script = fs.readFileSync(`${__dirname}/../script/vue.js`, 'utf-8')
-        // script = script.replace(/\$vuePath/g, `${__dirname}/../node_modules/vue`)
-        // script = script.replace(/\$baseComponentPath/g, `${component.path}/${component.def.script}`)
-        // script = script.replace(/\$componentName/g, component.name)
-        // script = script.replace(/\$componentId/g, instance.id)
-        // fs.writeFileSync(`${process.cwd()}/output/${smol.coreName}/_a`, script)
-        // await buildScript({inputFile: `${process.cwd()}/output/${smol.coreName}/_a`, outputFile: `${process.cwd()}/output/${smol.coreName}/_b`, templateBody, component})
-        // script = fs.readFileSync(`${process.cwd()}/output/${smol.coreName}/_b`, 'utf-8')
-        // command.run(`rm ${process.cwd()}/output/${smol.coreName}/_a; rm ${process.cwd()}/output/${smol.coreName}/_b`)
-        // pageScript.push(script)
         let instance = componentInstances[instanceIndex]
         instanceIndex++
         let templateBody = match.slice(match.indexOf('>') + 1)
