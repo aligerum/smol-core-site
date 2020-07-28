@@ -15,26 +15,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
 
 // load build config
-const buildConfig = fs.existsSync(`${process.cwd()}/core/${smol.coreName}/data/build.js`) ? require(`${process.cwd()}/core/${smol.coreName}/data/build.js`) : {}
-if (!buildConfig.publicPath) buildConfig.publicPath = 'public'
-if (!buildConfig.pageStylePath) buildConfig.pageStylePath = 'style/page'
-if (!buildConfig.pageScriptPath) buildConfig.pageScriptPath = 'script/page'
-
-// clean and sort build options by length, so least specific rules are applied first
-if (buildConfig.files) {
-  buildConfig.files.forEach(file => {
-    if (file.src) file.src = file.src.split('/').filter(item => item).join('/')
-  })
-  buildConfig.files.sort((a, b) => {
-    if (!a.src && !b.src) return 0
-    if (a.src && !b.src) return -1
-    if (b.src && !a.src) return 1
-    if (a.src == b.src) return 0
-    if (a.src.length < b.src.length) return -1
-    if (a.src.length > b.src.length) return 1
-    return 0
-  })
-}
+let buildConfig = fs.existsSync(`${process.cwd()}/core/${smol.coreName}/data/build.js`) ? require(`${process.cwd()}/core/${smol.coreName}/data/build.js`) : null
 
 // determine component paths
 let components = {}
@@ -472,10 +453,12 @@ let buildAssets = async (command, outputDir) => {
   for (let fileDef of buildConfig.files.filter(def => def.to)) {
 
     // handle each item
+    if (!fileDef.each) fileDef.each = [null]
     for (let item of fileDef.each) {
 
       // determine output filename
       let outputName = typeof fileDef.to == 'string' ? fileDef.to : fileDef.to(item)
+      outputName = outputName.replace(/.html?$/i, '')
 
       // determine template data
       let templateData = {}
@@ -490,7 +473,7 @@ let buildAssets = async (command, outputDir) => {
       // build template
       let dir = `${outputDir}/${outputName}`.split('/').slice(0, -1).join('/')
       command.run(`mkdir -p ${dir}`)
-      await buildPug(command, `${process.cwd()}/core/${smol.coreName}/include/pug/${fileDef.src}`, `${outputDir}/${outputName}`, outputDir, templateData)
+      await buildPug(command, `${process.cwd()}/core/${smol.coreName}/include/pug/${fileDef.src.replace(/.pug$/i, '')}.pug`, `${outputDir}/${outputName}`, outputDir, templateData)
 
     }
 
@@ -498,6 +481,29 @@ let buildAssets = async (command, outputDir) => {
 }
 
 module.exports = async command => {
+
+  // init build config
+  if (buildConfig) buildConfig = await buildConfig() || {}
+  else buildConfig = {}
+  if (!buildConfig.publicPath) buildConfig.publicPath = 'public'
+  if (!buildConfig.pageStylePath) buildConfig.pageStylePath = 'style/page'
+  if (!buildConfig.pageScriptPath) buildConfig.pageScriptPath = 'script/page'
+
+  // clean and sort build options by length, so least specific rules are applied first
+  if (buildConfig.files) {
+    buildConfig.files.forEach(file => {
+      if (file.src) file.src = file.src.split('/').filter(item => item).join('/')
+    })
+    buildConfig.files.sort((a, b) => {
+      if (!a.src && !b.src) return 0
+      if (a.src && !b.src) return -1
+      if (b.src && !a.src) return 1
+      if (a.src == b.src) return 0
+      if (a.src.length < b.src.length) return -1
+      if (a.src.length > b.src.length) return 1
+      return 0
+    })
+  }
 
   // clear output directory
   console.log(command.colors.yellow(`Cleaning output/${smol.coreName}...`))
