@@ -1,5 +1,4 @@
 const babel = require('@babel/core')
-const babelPresetEs2015 = require('babel-preset-es2015')
 const babelPresetEnv = require('@babel/preset-env')
 const execSync = require('child_process').execSync
 const fs = require('fs')
@@ -59,7 +58,10 @@ let buildPug = async (command, from, to, outputDir, templateData) => {
   let pageScript = []
   let pagePublicData = []
   let pageIds = []
-  let pageCommonTags = []
+  let pageCommonTags = [
+    {tag: 'script', attributes: {src: '//cdnjs.cloudflare.com/ajax/libs/core-js/3.6.5/minified.js'}},
+    {tag: 'script', attributes: {src: '//cdn.jsdelivr.net/npm/regenerator-runtime@0.13.7/runtime.min.js'}},
+  ]
 
   // compile pug
   let output = pug.compile(fs.readFileSync(from, 'utf-8'), pugOptions)(templateData)
@@ -207,18 +209,18 @@ let buildPug = async (command, from, to, outputDir, templateData) => {
         script = script.replace(/\$baseComponentPath/g, `${component.path}/${component.def.script}`)
         script = script.replace(/\$componentName/g, component.name)
         script = script.replace(/\$componentId/g, instance.id)
-        fs.writeFileSync(`${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}`, script)
-        await buildScript({inputFile: `${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}`, outputFile: `${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}`, templateBody, component})
-        script = fs.readFileSync(`${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}`, 'utf-8')
-        command.run(`rm ${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}; rm ${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}`)
+        fs.writeFileSync(`${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}.js`, script)
+        await buildScript({inputFile: `${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}.js`, outputFile: `${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}.js`, templateBody, component})
+        script = fs.readFileSync(`${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}.js`, 'utf-8')
+        command.run(`rm ${process.cwd()}/output/${smol.coreName}/_a${instanceIndex-1}.js; rm ${process.cwd()}/output/${smol.coreName}/_b${instanceIndex-1}.js`)
         pageScript.push(script)
       }
     } else if (component.def.script) {
       let script = fs.readFileSync(`${component.path}/${component.def.script}`, 'utf-8')
       if (script.match(/require/) || script.match(/import/)) {
-        await buildScript({inputFile: `${component.path}/${component.def.script}`, outputFile: `${process.cwd()}/output/${smol.coreName}/_a`, component})
-        script = fs.readFileSync(`${process.cwd()}/output/${smol.coreName}/_a`, 'utf-8')
-        command.run(`rm ${process.cwd()}/output/${smol.coreName}/_a`)
+        await buildScript({inputFile: `${component.path}/${component.def.script}`, outputFile: `${process.cwd()}/output/${smol.coreName}/_a.js`, component})
+        script = fs.readFileSync(`${process.cwd()}/output/${smol.coreName}/_a.js`, 'utf-8')
+        command.run(`rm ${process.cwd()}/output/${smol.coreName}/_a.js`)
       } else {
         script = `(() => {var publicData = (window.smolPublicData && window.smolPublicData.${smol.string.camelCase(name)}) ? window.smolPublicData.${smol.string.camelCase(name)} : {};${script}})()`
       }
@@ -280,7 +282,7 @@ let buildPug = async (command, from, to, outputDir, templateData) => {
   if (pageScript.filter(script => script).length) {
     command.run(`mkdir -p ${outputDir}/${buildConfig.publicPath}/${buildConfig.pageScriptPath}/${hrefPath}`)
     let filename = `${outputDir}/${buildConfig.publicPath}/${buildConfig.pageScriptPath}/${hrefPath}/${name}.js`
-    let script = await buildScript({script: pageScript.join(''), filename})
+    let script = await buildScript({script: pageScript.join(';\n'), filename})
     fs.writeFileSync(filename, script)
     output = output.replace(/<\/body>/, `<script src="/${buildConfig.pageScriptPath}/${hrefPath ? hrefPath + '/' : ''}${name}.js"></script></body>`)
   }
@@ -299,8 +301,7 @@ let buildScript = async options => {
     let babelOptions = {
       filename: options.filename,
       presets: [
-        babelPresetEs2015,
-        [babelPresetEnv, {targets: 'defaults', modules: 'auto'}],
+        [babelPresetEnv, {targets: { ie: '11' }}],
       ],
     }
     script = babel.transform(script, babelOptions).code
@@ -319,7 +320,17 @@ let buildScript = async options => {
     module: {
       rules: [
         { test: /\.css$/, use: ['vue-style-loader', 'css-loader'] },
-        { test: /\.js$/, use: 'babel-loader' },
+        {
+          test: /\.js$/,
+          use: {
+            loader: require.resolve('babel-loader'),
+            options: {
+              presets: [
+                [ require.resolve('@babel/preset-env'), { targets: { ie: '11'} } ],
+              ],
+            },
+          }
+        },
         {
           test: /\.pug$/,
           use: {
@@ -328,7 +339,7 @@ let buildScript = async options => {
           },
         },
         { test: /\.styl(us)?$/, use: ['vue-style-loader', 'css-loader', 'stylus-loader'] },
-        { test: /\.vue$/, use: 'vue-loader' },
+        { test: /\.vue$/, use: ['vue-loader'] },
       ],
     },
     plugins: [
@@ -356,7 +367,7 @@ let buildScript = async options => {
       },
     },
   }
-  if (options.templateBody) config.module.rules.find(rule => rule.use == 'vue-loader').use = ['vue-loader', {loader: `${__dirname}/../script/static-slot-loader.js`, options: {templateBody: options.templateBody}}]
+  if (options.templateBody) config.module.rules.find(rule => rule.use && rule.use[0] && rule.use[0] == 'vue-loader').use.push({loader: `${__dirname}/../script/static-slot-loader.js`, options: {templateBody: options.templateBody}})
   if (options.component) config.resolve.modules.push(options.component.modulePath)
   // if (smolConfig.mode == 'development') config.resolve.alias.vue = 'vue/dist/vue.js'
 
