@@ -156,3 +156,18 @@ export default {
 ```
 
 You can then pass this data down to subcomponents using `v-bind`, or just access `window.smolPublicData.someComponent` during their `data` function as well.
+
+# Refs
+
+It's common to need to run methods or access/modify data within a Vue component from other scripts on the page. To access the Vue component instance, set a `ref` attribute on the tag in the template, then access it by name via `window.smolComponents`. For example:
+
+```pug
+extends /page
+
+block body
+  product-list(ref="myProductList")
+```
+
+```js
+window.smolComponents.myProductList.refreshProducts()
+```
