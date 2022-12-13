@@ -20,7 +20,7 @@
     "babel-loader": "^8.0.6",
     "babel-minify-webpack-plugin": "^0.3.1",
     "css-loader": "^3.4.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "loader-utils": "^2.0.0",
     "pug": "^3.0.0",
     "pug-loader": "^2.4.0",
